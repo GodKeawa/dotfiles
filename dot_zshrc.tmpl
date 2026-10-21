@@ -103,7 +103,11 @@ export MANPATH="/usr/local/texlive/2026/texmf-dist/doc/man:$MANPATH"
 
 # BitWarden Session 
 BW_SESSION_FILE="$HOME/.bw_session"
-export BW_SESSION=$(cat "$BW_SESSION_FILE")
+if [[ -f $BW_SESSION_FILE ]]; then
+    export BW_SESSION=$(cat "$BW_SESSION_FILE")
+else
+    bw_unlock
+fi 
 
 # TOKEN
 export HF_TOKEN={{ (bitwardenFields "item" "APIKEY_AND_TOKEN").HF_TOKEN.value | quote }}
@@ -143,17 +147,16 @@ alias pc="podman compose"
 alias phs="python -m http.server 8080"
 
 function easyconnect() {
-    
-  local vnc_port=15901
-  local socks_port=17897
-  docker run -d --name EasyConnect --rm \
-    --device /dev/net/tun --cap-add NET_ADMIN -ti \
-    -e PASSWORD=EasyConnectVNCSecret -e URLWIN=1 \
-    -v $HOME/.ecdata:/root \
-    -p 127.0.0.1:$vnc_port:5901 -p 127.0.0.1:$socks_port:1080 \
-    hagb/docker-easyconnect:7.6.7
+    local vnc_port=15901
+    local socks_port=17897
+    docker run -d --name EasyConnect --rm \
+        --device /dev/net/tun --cap-add NET_ADMIN -ti \
+        -e PASSWORD=password -e URLWIN=1 \
+        -v $HOME/.ecdata:/root \
+        -p 127.0.0.1:$vnc_port:5901 -p 127.0.0.1:$socks_port:1080 \
+        hagb/docker-easyconnect:7.6.7
   sleep 3
-  vncviewer 127.0.0.1:$vnc_port -PasswordFile=$HOME/.ecdata/.vnc_passwd
+  vncviewer 127.0.0.1:$vnc_port -PasswordFile=$HOME/.ecdata/.vnc/passwd
 }
 
 
