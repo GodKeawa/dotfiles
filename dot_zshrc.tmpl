@@ -106,9 +106,9 @@ BW_SESSION_FILE="$HOME/.bw_session"
 export BW_SESSION=$(cat "$BW_SESSION_FILE")
 
 # TOKEN
-export HF_TOKEN="{{ (bitwardenFields "item" "APIKEY_AND_TOKEN").HF_TOKEN.value }}"
-export WANDB_KEY="{{ (bitwardenFields "item" "APIKEY_AND_TOKEN").WANDB_KEY.value }}"
-export CF_TOKEN="{{ (bitwardenFields "item" "APIKEY_AND_TOKEN").CF_TOKEN.value }}"
+export HF_TOKEN={{ (bitwardenFields "item" "APIKEY_AND_TOKEN").HF_TOKEN.value | quote }}
+export WANDB_KEY={{ (bitwardenFields "item" "APIKEY_AND_TOKEN").WANDB_KEY.value | quote }}
+export CF_TOKEN={{ (bitwardenFields "item" "APIKEY_AND_TOKEN").CF_TOKEN.value | quote }}
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -138,9 +138,12 @@ alias ls="lsd"
 alias ssh="kitty +kitten ssh"
 
 alias dc="docker compose"
-compdef dc=docker-compose
+alias pc="podman compose"
+
+alias phs="python -m http.server 8080"
 
 function easyconnect() {
+    
   local vnc_port=15901
   local socks_port=17897
   docker run -d --name EasyConnect --rm \

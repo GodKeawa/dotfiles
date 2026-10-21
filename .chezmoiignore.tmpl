@@ -1,0 +1,16 @@
+# Always
+README.md
+
+# Windows
+{{ if ne .chezmoi.os "windows" }}
+AppData/
+Documents/
+{{ end }}
+
+# Linux 系统
+{{ if ne .chezmoi.os "linux" }}
+.config/
+.zshrc
+.zprofile
+{{ end }}
+

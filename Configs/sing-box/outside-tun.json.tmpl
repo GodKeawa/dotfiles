@@ -1,0 +1,301 @@
+{
+    "log": {
+        "level": "info",
+        "timestamp": true
+    },
+    "dns": {
+        "strategy": "ipv4_only",
+        "servers": [
+            {
+                "type": "fakeip",
+                "tag": "dns-fakeip",
+                "inet4_range": "198.18.0.0/15"
+            },
+            {
+                "type": "https",
+                "tag": "dns-local",
+                "domain_resolver": "dns-local-resolver",
+                "server": "dns.alidns.com",
+                "path": "/dns-query"
+            },
+            {
+                "type": "udp",
+                "tag": "dns-local-resolver",
+                "server": "223.5.5.5",
+                "server_port": 53
+            },
+            {
+                "type": "tls",
+                "tag": "dns-remote",
+                "detour": "proxy",
+                "domain_resolver": "dns-local-resolver",
+                "server": "8.8.8.8",
+                "server_port": 853
+            }
+        ],
+        "rules": [
+            {
+                "rule_set": "category-ads-all",
+                "action": "reject"
+            },
+            {
+                "rule_set": "custom-direct",
+                "server": "dns-local"
+            },
+            {
+                "rule_set": "custom-proxy",
+                "server": "dns-remote"
+            },
+            {
+                "rule_set": [
+                    "geosite-private",
+                    "geosite-cn"
+                ],
+                "server": "dns-local"
+            },
+            {
+                "type": "logical",
+                "mode": "and",
+                "rules": [
+                    {
+                        "domain_suffix": [
+                            ".lan",
+                            ".localdomain",
+                            ".example",
+                            ".invalid",
+                            ".localhost",
+                            ".test",
+                            ".local",
+                            ".home.arpa",
+                            ".msftconnecttest.com",
+                            ".msftncsi.com"
+                        ],
+                        "invert": true
+                    },
+                    {
+                        "query_type": [
+                            "A",
+                            "AAAA"
+                        ]
+                    }
+                ],
+                "server": "dns-fakeip"
+            },
+            {
+                "rule_set": "geosite-geolocation-!cn",
+                "server": "dns-remote"
+            }
+        ],
+        "final": "dns-remote"
+    },
+    "inbounds": [
+        {
+            "type": "mixed",
+            "tag": "mixed-in",
+            "listen": "0.0.0.0",
+            "listen_port": 7897,
+            "tcp_fast_open": true,
+            "tcp_multi_path": true,
+            "udp_fragment": true
+        },
+        {
+            "type": "tun",
+            "tag": "tun-in",
+            "interface_name": "tun0",
+            "address": [
+                "172.19.0.1/30"
+            ],
+            "auto_route": true,
+            "strict_route": true,
+            "stack": "mixed",
+            "dns_mode": "hijack"
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "selector",
+            "tag": "proxy",
+            "outbounds": [
+                "VPS",
+                "direct"
+            ],
+            "interrupt_exist_connections": true
+        },
+        {
+            "type": "vless",
+            "tag": "VPS",
+            "server": "154.21.87.43",
+            "server_port": 24816,
+            "uuid": "c8fcdf4d-9b67-41f3-acc2-23bd2a5ff6ff",
+            "flow": "xtls-rprx-vision",
+            "tls": {
+                "enabled": true,
+                "server_name": "images.apple.com",
+                "utls": {
+                    "enabled": true,
+                    "fingerprint": "chrome"
+                },
+                "reality": {
+                    "enabled": true,
+                    "public_key": "m3VeUMs_arpo9CRBeggs1MWAa8br8n_YWm7tqFBFXlw",
+                    "short_id": "6ba85179e30d4fc2"
+                }
+            }
+        },
+        {
+            "type": "direct",
+            "tag": "direct"
+        },
+        {
+            "type": "block",
+            "tag": "block"
+        }
+    ],
+    "route": {
+        "rules": [
+            {
+                "type": "logical",
+                "mode": "or",
+                "rules": [
+                    {
+                        "protocol": "dns"
+                    },
+                    {
+                        "port": "53"
+                    }
+                ],
+                "action": "hijack-dns"
+            },
+            {
+                "ip_cidr": "154.21.87.43/32",
+                "outbound": "direct"
+            },
+            {
+                "rule_set": [
+                    "custom-direct",
+                    "geosite-private",
+                    "geosite-cn",
+                    "geoip-private",
+                    "geoip-cn"
+                ],
+                "outbound": "direct"
+            },
+            {
+                "rule_set": [
+                    "custom-proxy",
+                    "geosite-geolocation-!cn"
+                ],
+                "outbound": "proxy"
+            },
+            {
+                "rule_set": "category-ads-all",
+                "outbound": "block"
+            },
+        ],
+        "rule_set": [
+            {
+                "tag": "custom-direct",
+                "rules": [
+                    {
+                        "domain_suffix": [
+                            "steamcontent.com",
+                            "content.steampowered.com",
+                            "hsar.steampowered.com"
+                            
+                        ]
+                    }
+                ]
+            },
+            {
+                "tag": "custom-proxy",
+                "rules": [
+                    {
+                        "domain_suffix": [
+                            "code.visualstudio.com",
+                            "github.com",
+                            "githubusercontent.com"
+                            
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "remote",
+                "tag": "category-ads-all",
+                "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+                "http_client": {
+                    "version": 2,
+                    "detour": "proxy",
+                    "stream_receive_window": 0,
+                    "connection_receive_window": 0
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "geosite-private",
+                "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
+                "http_client": {
+                    "version": 2,
+                    "detour": "proxy",
+                    "stream_receive_window": 0,
+                    "connection_receive_window": 0
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "geoip-private",
+                "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs",
+                "http_client": {
+                    "version": 2,
+                    "detour": "proxy",
+                    "stream_receive_window": 0,
+                    "connection_receive_window": 0
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "geosite-cn",
+                "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+                "http_client": {
+                    "version": 2,
+                    "detour": "proxy",
+                    "stream_receive_window": 0,
+                    "connection_receive_window": 0
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "geoip-cn",
+                "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+                "http_client": {
+                    "version": 2,
+                    "detour": "proxy",
+                    "stream_receive_window": 0,
+                    "connection_receive_window": 0
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "geosite-geolocation-!cn",
+                "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
+                "http_client": {
+                    "version": 2,
+                    "detour": "proxy",
+                    "stream_receive_window": 0,
+                    "connection_receive_window": 0
+                }
+            }
+        ],
+        "final": "proxy",
+        "auto_detect_interface": true,
+        "default_domain_resolver": "dns-local"
+    },
+    "experimental": {
+        "cache_file": {
+            "enabled": true,
+            "path": "cache.db",
+            "store_fakeip": true,
+            "rdrc_timeout": "168h0m0s"
+        }
+    }
+}

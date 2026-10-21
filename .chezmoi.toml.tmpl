@@ -1,0 +1,10 @@
+{{/* 设备名称 */}}
+{{- $deviceName := promptStringOnce . "deviceName" "Device Name" -}}
+
+[data]
+    deviceName = {{ $deviceName | quote }}
+
+[diff]
+command = "code"
+args = ["--wait", "--diff"]
+
