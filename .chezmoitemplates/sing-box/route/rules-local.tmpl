@@ -1,0 +1,45 @@
+"rules": [
+    {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+            {
+                "protocol": "dns"
+            },
+            {
+                "port": 53
+            }
+        ],
+        "action": "hijack-dns"
+    },
+    {
+        "rule_set": "godke-dev",
+        "action": "resolve"
+    },
+    {
+        "ip_cidr": "{{ (bitwardenFields "item" "SINGBOX").server.value }}/32",
+        "outbound": "direct"
+    },
+    {
+        "rule_set": [
+            "custom-direct",
+            "godke-dev",
+            "geosite-private",
+            "geosite-cn",
+            "geoip-private",
+            "geoip-cn"
+        ],
+        "outbound": "direct"
+    },
+    {
+        "rule_set": [
+            "custom-proxy",
+            "geosite-geolocation-!cn"
+        ],
+        "outbound": "proxy"
+    },
+    {
+        "rule_set": "category-ads-all",
+        "outbound": "block"
+    }
+],

@@ -1,0 +1,28 @@
+"inbounds": [
+    {
+        "type": "mixed",
+        "tag": "mixed-in",
+        "listen": "0.0.0.0",
+        "listen_port": 7897,
+        "tcp_fast_open": true,
+        "tcp_multi_path": true,
+        "udp_fragment": true
+    },
+    {
+        "type": "tun",
+        "tag": "tun-in",
+        "interface_name": "tun0",
+        "address": [
+            "172.19.0.1/30"
+        ],
+        "auto_route": true,
+        "strict_route": true,
+{{ if eq .chezmoi.os "linux" }}
+        "stack": "system",
+        "auto_redirect": true,
+{{ else }}
+        "stack": "mixed",
+{{ end }}
+        "dns_mode": "hijack"
+    }
+],

@@ -1,0 +1,40 @@
+"outbounds": [
+    {
+        "type": "selector",
+        "tag": "proxy",
+        "outbounds": [
+            "VPS",
+            "direct"
+        ],
+        "interrupt_exist_connections": true
+    },
+    {
+        "type": "vless",
+        "tag": "VPS",
+        "server": {{ (bitwardenFields "item" "SINGBOX").server.value | quote }},
+        "server_port": {{ (bitwardenFields "item" "SINGBOX").server_port.value }},
+        "uuid": {{ (bitwardenFields "item" "SINGBOX").uuid.value | quote }},
+        "flow": {{ (bitwardenFields "item" "SINGBOX").flow.value | quote }},
+        "tls": {
+            "enabled": true,
+            "server_name": {{ (bitwardenFields "item" "SINGBOX").tls_server_name.value | quote }},
+            "utls": {
+                "enabled": true,
+                "fingerprint": {{ (bitwardenFields "item" "SINGBOX").tls_utls_fingerprint.value | quote }}
+            },
+            "reality": {
+                "enabled": true,
+                "public_key": {{ (bitwardenFields "item" "SINGBOX").tls_reality_public_key.value | quote }},
+                "short_id": {{ (bitwardenFields "item" "SINGBOX").tls_reality_short_id.value | quote }}
+            }
+        }
+    },
+    {
+        "type": "direct",
+        "tag": "direct"
+    },
+    {
+        "type": "block",
+        "tag": "block"
+    }
+],

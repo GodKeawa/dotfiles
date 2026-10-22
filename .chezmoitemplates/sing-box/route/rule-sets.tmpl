@@ -1,0 +1,88 @@
+"rule_set": [
+    {
+        "tag": "custom-direct",
+        "rules": [
+            {
+                "domain_suffix": [
+{{ includeTemplate "sing-box/route/custom-direct.tmpl" . | indent 20 }}
+                ]
+            }
+        ]
+    },
+    {
+        "tag": "custom-proxy",
+        "rules": [
+            {
+                "domain_suffix": [
+{{ includeTemplate "sing-box/route/custom-proxy.tmpl" . | indent 20 }}
+                ]
+            }
+        ]
+    },
+    {
+        "type": "remote",
+        "tag": "category-ads-all",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "http_client": {
+            "version": 2,
+            "detour": "proxy",
+            "stream_receive_window": 0,
+            "connection_receive_window": 0
+        }
+    },
+    {
+        "type": "remote",
+        "tag": "geosite-private",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
+        "http_client": {
+            "version": 2,
+            "detour": "proxy",
+            "stream_receive_window": 0,
+            "connection_receive_window": 0
+        }
+    },
+    {
+        "type": "remote",
+        "tag": "geoip-private",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs",
+        "http_client": {
+            "version": 2,
+            "detour": "proxy",
+            "stream_receive_window": 0,
+            "connection_receive_window": 0
+        }
+    },
+    {
+        "type": "remote",
+        "tag": "geosite-cn",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+        "http_client": {
+            "version": 2,
+            "detour": "proxy",
+            "stream_receive_window": 0,
+            "connection_receive_window": 0
+        }
+    },
+    {
+        "type": "remote",
+        "tag": "geoip-cn",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+        "http_client": {
+            "version": 2,
+            "detour": "proxy",
+            "stream_receive_window": 0,
+            "connection_receive_window": 0
+        }
+    },
+    {
+        "type": "remote",
+        "tag": "geosite-geolocation-!cn",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
+        "http_client": {
+            "version": 2,
+            "detour": "proxy",
+            "stream_receive_window": 0,
+            "connection_receive_window": 0
+        }
+    }
+],
