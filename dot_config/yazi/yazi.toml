@@ -1,0 +1,106 @@
+[mgr]
+ratio = [1, 4, 3]
+sort_by = "extension"
+sort_sensitive = false
+sort_reverse = false
+sort_dir_first = true
+linemode = "btime"
+show_hidden = false
+show_symlink = true
+
+[preview]
+wrap = "yes"
+image_filter = "lanczos3"
+
+
+[plugin]
+prepend_preloaders = [
+  # mediainfo also handles thumbnails and metadata for these media classes.
+  { mime = "{audio,video,image}/*", run = "mediainfo" },
+  { mime = "application/{subrip,postscript,illustrator,dvb.ait,vnd.adobe.illustrator,eps}", run = "mediainfo" },
+  { url = "*.{ai,ait,eps,ps,psd,srt,ass,ssa,vtt}", run = "mediainfo" },
+]
+prepend_previewers = [
+  { mime = "{audio,video,image}/*", run = "mediainfo" },
+  { mime = "application/{subrip,postscript,illustrator,dvb.ait,vnd.adobe.illustrator,eps}", run = "mediainfo" },
+  { url = "*.{ai,ait,eps,ps,psd,srt,ass,ssa,vtt}", run = "mediainfo" },
+  { url = "*/", run = "folder" },
+]
+
+[tasks]
+image_alloc = 1073741824 # = 1024*1024*1024 = 1024MB
+
+[opener]
+# 文本编辑：优先 nvim (在当前终端打开)
+edit = [
+    { run = 'nvim %s', block = true, desc = "Neovim" },
+]
+vscode = [
+    { run = 'code %s', orphan = true, desc = "VSCode" },
+]
+# 媒体查看
+play = [
+    { run = 'vlc %s', orphan = true, desc = "VLC" },
+]
+
+view = [
+    { run = 'gwenview %s', orphan = true, desc = "gwenview" },
+]
+
+# 压缩包管理
+peazip = [
+    { run = 'peazip %s', orphan = true, desc = "peazip" },
+]
+
+# PDF 查看：使用 Chrome (快速、原生支持 Wayland)
+chrome = [
+    { run = 'google-chrome-stable %s', orphan = true, desc = "Chrome" },
+]
+
+# PDF 编辑：使用 Foxit (注入环境变量解决 QT 插件加载问题)
+foxit = [
+    { run = 'env QT_QPA_PLATFORM=xcb foxitreader %s', orphan = true, desc = "Foxit Reader (XCB Mode)" },
+]
+
+# Unknown or vendor-specific files: delegate to the desktop MIME handler.
+system = [
+    { run = 'xdg-open %s', orphan = true, desc = "系统默认程序" },
+]
+
+# Office 文档：WPS 
+wps = [
+    { run = 'wps %s', orphan = true, desc = "WPS Writer" },
+]
+
+[open]
+prepend_rules = [
+    # Text, source code and structured data. The extension rule catches files
+    # whose MIME database entry is application/octet-stream or vendor-specific.
+    { mime = "text/*", use = [ "edit", "vscode" ] },
+    { mime = "inode/x-empty", use = [ "edit", "vscode" ] },
+    { mime = "application/{json,javascript,xml,sql,toml,yaml,x-yaml,x-sh,x-shellscript,x-python,x-ruby,x-perl,x-php,x-httpd-php,x-latex,rtf}", use = [ "edit", "vscode" ] },
+    { url = "*.{asc,awk,bash,c,cc,conf,cpp,css,csv,env,fish,h,hpp,ini,java,js,json,jsonl,jsx,log,lua,md,mjs,patch,py,rb,rs,scss,sh,sql,srt,ssa,toml,ts,tsx,txt,vtt,xml,yaml,yml,zsh}", use = [ "edit", "vscode" ] },
+
+    # Documents.
+    { mime = "application/pdf", use = [ "chrome", "foxit" ] },
+    { url = "*.{pdf}", use = [ "chrome", "foxit" ] },
+    { mime = "application/{msword,vnd.ms-word,vnd.ms-excel,vnd.ms-powerpoint,vnd.openxmlformats-officedocument.*,vnd.oasis.opendocument.*,vnd.apple.pages,vnd.apple.numbers,vnd.apple.keynote}", use = [ "wps" ] },
+    { url = "*.{doc,docx,docm,dot,dotx,xls,xlsx,xlsm,xlt,xltx,ppt,pptx,pptm,pot,potx,odt,ods,odp,rtf}", use = [ "wps" ] },
+
+    # Media.
+    { mime = "video/*", use = "play" },
+    { mime = "audio/*", use = "play" },
+    { mime = "image/*", use = "view" },
+    { mime = "application/{postscript,eps,illustrator,vnd.adobe.illustrator}", use = "view" },
+    { url = "*.{ai,ait,eps,ps,psd}", use = "view" },
+
+    # Archives and disk images.
+    { mime = "application/{zip,x-zip-compressed,x-7z-compressed,x-rar-compressed,vnd.rar,gzip,x-gzip,x-bzip2,x-xz,zstd,x-zstd,x-lzip,x-compress,x-tar,tar,java-archive,x-cpio,x-arj,x-apple-diskimage}", use = "peazip" },
+    { url = "*.{7z,ace,arj,bz,bz2,cab,cpio,dmg,gz,jar,lha,lzh,rar,tar,tbz,tbz2,tgz,xz,zip,zst}", use = "peazip" },
+
+]
+append_rules = [
+    # Keep unknown/vendor-specific MIME types deterministic instead of relying
+    # on whichever default rule a future Yazi release adds.
+    { mime = "*", use = "system" },
+]
