@@ -1,8 +1,8 @@
 # Read more about SSH config files: https://linux.die.net/man/5/ssh_config
 # ===================== Public Service ========================
 Host Github
-	HostName github.com
-	User git
+    HostName github.com
+    User git
     Port 22
     ProxyCommand nc -X 5 -x 127.0.0.1:7897 %h %p
         PreferredAuthentications publickey
@@ -33,42 +33,42 @@ Host Lab_remote
 
 
 Host VPS
-	HostName {{ (bitwardenFields "item" "SECRET").VPS_IP.value }}
-	User root
-	Port 22
+    HostName {{ (bitwardenFields "item" "SECRET").VPS_IP.value }}
+    User root
+    Port 22
         PreferredAuthentications publickey
         IdentityFile ~/.ssh/id_rsa
 
 # ===================== Local ========================
 HOST Router
     HostName 192.168.8.1
-	User root
+    User root
     Port 22
 
 HOST NAS
-	HostName 192.168.8.136
-	User GodKe
-	Port 22
+    HostName 192.168.8.136
+    User GodKe
+    Port 22
 
 # ===================== Device ========================
-HOST PC 
+HOST PC
     HostName 192.168.8.135
-	User godke
-	Port 22
-	   PreferredAuthentications publickey
-    	IdentityFile ~/.ssh/id_rsa
+    User godke
+    Port 22
+        PreferredAuthentications publickey
+        IdentityFile ~/.ssh/id_rsa
 
 HOST PC_remote
-	HostName ssh.u1914907.nyat.app
-	User godke
-	Port 65535
-		PreferredAuthentications publickey
-    	IdentityFile ~/.ssh/id_rsa
+    HostName ssh.u1914907.nyat.app
+    User godke
+    Port 65535
+        PreferredAuthentications publickey
+        IdentityFile ~/.ssh/id_rsa
 
 Host Laptop
-	HostName 192.168.8.177
-	User godke
-	Port 22
+    HostName 192.168.8.177
+    User godke
+    Port 22
         PreferredAuthentications publickey
         IdentityFile ~/.ssh/id_rsa
 
